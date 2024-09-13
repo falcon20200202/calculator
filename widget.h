@@ -22,8 +22,8 @@ public:
     QString calStr;
     QString resultStr;
     QChar sym;
-    int first_num;
-    int second_num;
+    float first_num;
+    float second_num;
 
 private:
     Ui::Widget *ui;

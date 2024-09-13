@@ -5,13 +5,15 @@
 #include <QDebug>
 #include <QPushButton>
 
-int calculate_result(int first_num,int second_num, QChar sym){
+float calculate_result(float first_num,float second_num, QChar sym){
     if(sym == '+'){
         return first_num+second_num;
     }else if(sym == '-'){
         return first_num-second_num;
     }else if(sym == '*'){
         return first_num * second_num;
+    }else if(sym == '/'){
+        return first_num / second_num;
     }else{
         return 0;
     }
@@ -77,6 +79,11 @@ Widget::Widget(QWidget *parent)
         calStr += "9";
         ui->label_calculate->setText(calStr);
     });
+    //小数点
+    connect(ui->symDot,&QPushButton::clicked,this,[this](){
+        calStr += ".";
+        ui->label_calculate->setText(calStr);
+    });
 
     //点击符号键 返回符号
     connect(ui->symEqual,&QPushButton::clicked,this,[this](){
@@ -87,8 +94,8 @@ Widget::Widget(QWidget *parent)
         }
         //将符号后面的保存为第二位
         int symPos = calStr.lastIndexOf(QChar(sym));
-        first_num = calStr.left(symPos).toInt();
-        second_num = calStr.mid(symPos+1).toInt();
+        first_num = calStr.left(symPos).toFloat();
+        second_num = calStr.mid(symPos+1).toFloat();
 
         //连算，结果保存为第一个数
         first_num = calculate_result(first_num,second_num,sym);
@@ -102,21 +109,27 @@ Widget::Widget(QWidget *parent)
     });
 
     connect(ui->symPlus,&QPushButton::clicked,this,[this](){
-        first_num = calStr.toInt();
+        first_num = calStr.toFloat();
         calStr += "+";
         sym = '+';
         ui->label_calculate->setText(calStr);
     });
     connect(ui->symMinus,&QPushButton::clicked,this,[this](){
-        first_num = calStr.toInt();
+        first_num = calStr.toFloat();
         calStr += "-";
         sym = '-';
         ui->label_calculate->setText(calStr);
     });
     connect(ui->symMul,&QPushButton::clicked,this,[this](){
-        first_num = calStr.toInt();
+        first_num = calStr.toFloat();
         calStr += "*";
         sym = '*';
+        ui->label_calculate->setText(calStr);
+    });
+    connect(ui->symDiv,&QPushButton::clicked,this,[this](){
+        first_num = calStr.toFloat();
+        calStr += "/";
+        sym = '/';
         ui->label_calculate->setText(calStr);
     });
 
