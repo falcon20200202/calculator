@@ -3,6 +3,12 @@
 #define WIDGET_H
 
 #include <QWidget>
+#include <map>
+#include <vector>
+#include <string>
+#include <stack>
+
+using namespace std;
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -16,16 +22,44 @@ class Widget : public QWidget
 
 public:
     Widget(QWidget *parent = nullptr);
-
-
     ~Widget();
-    QString calStr;
-    QString resultStr;
-    QChar sym;
-    float first_num;
-    float second_num;
+
+private slots:
+    // 数字按钮点击处理
+    void onDigitPressed();
+    // 操作符按钮点击处理
+    void onOperatorPressed();
+    // 清除按钮点击处理
+    void onClearPressed();
+    // 小数点按钮点击处理
+    void onDecimalPressed();
+    // 括号按钮点击处理
+    void onBracketsPressed();
+    // 等号按钮点击处理
+    void onEqualPressed();
+
+    // QString calStr;
+    // QString resultStr;
+    // QChar sym;
+    // float first_num;
+    // float second_num;
 
 private:
     Ui::Widget *ui;
+
+    // 操作符优先级
+    map<char,int> precedence;
+    // 当前表达式
+    string curExpression;
+    // 判断是否为数字，与符号区分
+    bool isNum(const string& token);
+    // 中缀表达式转逆波兰表达式
+    vector<string> infixToRPN(const string& expression);
+    // 计算逆波兰表达式
+    double evaluateRPN(const vector<string>& rpn);
+
+
+
+
 };
 #endif // WIDGET_H

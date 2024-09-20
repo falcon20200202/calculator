@@ -162,7 +162,7 @@
        </sizepolicy>
       </property>
       <property name="text">
-       <string>×</string>
+       <string>*</string>
       </property>
      </widget>
     </item>
@@ -338,7 +338,7 @@
      </widget>
     </item>
     <item row="4" column="1">
-     <widget class="QPushButton" name="num_10">
+     <widget class="QPushButton" name="buttonRightParen">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
         <horstretch>0</horstretch>
@@ -346,12 +346,12 @@
        </sizepolicy>
       </property>
       <property name="text">
-       <string>^2</string>
+       <string>)</string>
       </property>
      </widget>
     </item>
     <item row="4" column="0">
-     <widget class="QPushButton" name="num_12">
+     <widget class="QPushButton" name="buttonLeftParen">
       <property name="enabled">
        <bool>true</bool>
       </property>
@@ -374,7 +374,7 @@
        </size>
       </property>
       <property name="text">
-       <string>?</string>
+       <string>(</string>
       </property>
      </widget>
     </item>
