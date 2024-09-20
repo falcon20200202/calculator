@@ -5,8 +5,9 @@
 #include <QDebug>
 #include <QPushButton>
 #include <QMessageBox>
-#include <cmath>
+//#include <cmath>
 #include <sstream>
+#include <stack>
 
 
 // 数字按钮点击处理
@@ -19,27 +20,37 @@ void Widget::onDigitPressed(){
 // 操作符按钮点击处理
 void Widget::onOperatorPressed(){
     QPushButton *button = (QPushButton*)sender();
-    QString buttonValue = button->text();
-    curExpression += " " + buttonValue.toStdString() + " ";
+    QString buttonSym = button->text();
+    curExpression += buttonSym.toStdString();
     ui->label_calculate->setText(QString::fromStdString(curExpression));
 }
+
 // 清除按钮点击处理
 void Widget::onClearPressed(){
     curExpression.clear();
     ui->label_calculate->clear();
 }
+
+// 退位按钮点击处理
+void Widget::onDeletePressed(){
+    curExpression.pop_back();
+    ui->label_calculate->setText(QString::fromStdString(curExpression));
+}
+
 // 小数点按钮点击处理
 void Widget::onDecimalPressed(){
     curExpression += ".";
     ui->label_calculate->setText(QString::fromStdString(curExpression));
 }
+
 // 括号按钮点击处理
 void Widget::onBracketsPressed(){
     QPushButton *button = (QPushButton*)sender();
     QString buttonValue = button->text();
-    curExpression += " " + buttonValue.toStdString() + " ";
+    curExpression += buttonValue.toStdString();
     ui->label_calculate->setText(QString::fromStdString(curExpression));
 }
+
 // 等号按钮点击处理
 void Widget::onEqualPressed(){
     try{
@@ -63,42 +74,53 @@ void Widget::onEqualPressed(){
 
 
 
-
 // 判断是否为数字，与符号区分
 bool Widget::isNum(const string& token){
-    std::istringstream iss(token);
+    istringstream iss(token);
     double f;
     return (iss >> f) && iss.eof();
 }
 
 // 中缀表达式转逆波兰表达式
-vector<string> Widget::infixToRPN(const string& expression){
+vector<string> Widget::infixToRPN(const string& expression) {
     stack<char> operators;
     vector<string> output;
-    istringstream iss(expression);
-    string token;
+    string number; // 用于构建数字
 
-    while (iss >> token) {
-        if (isNum(token)) {
-            output.push_back(token);
-        } else if (token == "(") {
-            operators.push('(');
-        } else if (token == ")") {
-            while (!operators.empty() && operators.top() != '(') {
-                output.push_back(string(1, operators.top()));
-                operators.pop();
-            }
-            operators.pop();
+    for (size_t i = 0; i < expression.size(); ++i) {
+        char ch = expression[i];
+
+        if (isdigit(ch) || ch == '.') {  // 如果是数字或小数点
+            number += ch;
         } else {
-            char op = token[0];
-            while (!operators.empty() && operators.top() != '(' && precedence[operators.top()] >= precedence[op]) {
-                output.push_back(string(1, operators.top()));
-                operators.pop();
+            if (!number.empty()) {  // 把之前的数字存入output
+                output.push_back(number);
+                number.clear();
             }
-            operators.push(op);
+            if (ch == '(') {
+                operators.push(ch);
+            } else if (ch == ')') {
+                while (!operators.empty() && operators.top() != '(') {
+                    output.push_back(string(1, operators.top()));
+                    operators.pop();
+                }
+                operators.pop();  // 弹出 '('
+            } else {  // 处理操作符
+                while (!operators.empty() && operators.top() != '(' && precedence[operators.top()] >= precedence[ch]) {
+                    output.push_back(string(1, operators.top()));
+                    operators.pop();
+                }
+                operators.push(ch);
+            }
         }
     }
 
+    // 最后处理剩余的数字
+    if (!number.empty()) {
+        output.push_back(number);
+    }
+
+    // 处理剩下的操作符
     while (!operators.empty()) {
         output.push_back(string(1, operators.top()));
         operators.pop();
@@ -106,6 +128,7 @@ vector<string> Widget::infixToRPN(const string& expression){
 
     return output;
 }
+
 
 // 计算逆波兰表达式
 double Widget::evaluateRPN(const vector<string>& rpn){
@@ -159,8 +182,10 @@ Widget::Widget(QWidget *parent)
     connect(ui->symMul,&QPushButton::clicked,this,&Widget::onOperatorPressed);   // 乘
     connect(ui->symDiv,&QPushButton::clicked,this,&Widget::onOperatorPressed);   // 除
 
-    // 连接清除按钮点
+    // 连接清除按钮
     connect(ui->symClear,&QPushButton::clicked,this,&Widget::onClearPressed);
+    // 连接退位按钮
+    connect(ui->symDel,&QPushButton::clicked,this,&Widget::onDeletePressed);
     // 连接小数点按
     connect(ui->symDot,&QPushButton::clicked,this,&Widget::onDecimalPressed);
     // 连接括号按钮
@@ -169,12 +194,6 @@ Widget::Widget(QWidget *parent)
     // 连接等号按钮
     connect(ui->symEqual,&QPushButton::clicked,this,&Widget::onEqualPressed);
 
-    // connect(ui->symDel,&QPushButton::clicked,this,[&](){
-    //     //删除一位
-    //     calStr.chop(1);
-    //     ui->label_calculate->setText(calStr);
-
-    // }
 
 };
 
